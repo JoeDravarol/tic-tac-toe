@@ -7,8 +7,6 @@
 
 # [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], [7,5,3]]
 
-# 3. Allow player's to choose cell position via 1-9
-# 4. Update your data with the player name or symbol ('X', 'O')
 # 5. Loop through the a solution collections to check if anyone has got a line
 # 6. If both players didn't get a line then it's a draw
 # 7. Ask if the player would like to play again 
@@ -56,12 +54,13 @@ class Board
 end
 
 class Game
-  attr_accessor :player1, :player2, :board, :cells
+  attr_accessor :player1, :player2, :current_player, :board, :cells, :mark
   
   def initialize
     @cells = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     display_instructions
     @board = Board.new
+    play_game
   end
 
   def display_instructions
@@ -96,6 +95,48 @@ class Game
 
   def display_players_mark
     puts "Player 1 mark is '#{@player1}' and Player 2 mark is '#{@player2}'\n "
+  end
+
+  def get_player_mark
+    player = @current_player == @player1 ? "Player 1" : "Player 2"
+ 
+    loop do
+      puts "Where would you like to put your mark #{player}?"
+      @mark = gets.chomp.to_i
+      break if @cells.include?(@mark)
+    end
+  end
+
+  def update_cells_array_with_mark
+    index = @cells.index(@mark)
+    @cells[index] = @current_player
+  end
+
+  def display_board
+    @board.update_board(@cells)
+  end
+
+  def switch_player
+    @current_player =  @current_player == @player1 ? @player2 : @player1
+  end
+
+  def play_game
+    choose_player1_mark
+    set_player2_mark
+    display_players_mark
+    @current_player = @player1
+    display_board
+
+    until end_game
+      get_player_mark
+      update_cells_array_with_mark
+      display_board
+      switch_player
+    end
+  end
+
+  def end_game
+    false
   end
 end
 
