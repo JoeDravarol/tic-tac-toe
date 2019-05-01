@@ -119,6 +119,8 @@ class Game
       display_board
       switch_player
     end
+    
+    play_again?
   end
 
   def game_ended?
@@ -163,6 +165,24 @@ class Game
     end
   end
 
+  def play_again?
+    @cells = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    @winning_variant = [1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 4, 7, 2, 5, 8, 3, 6, 9, 1, 5, 9, 7, 5, 3]
+    input = nil
+
+    loop do
+      puts "Would you like to Play again? Y/N?"
+      input = gets.chomp.upcase
+
+      break if input == "Y" || input == "N"
+    end
+
+    if input == "Y"
+      play_game
+    else
+      puts "Thanks for playing!"
+    end
+  end
 end
 
 new_game = Game.new
