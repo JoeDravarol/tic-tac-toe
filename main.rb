@@ -1,5 +1,3 @@
-# 7. Ask if the player would like to play again 
-
 class Board
   @@cells = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -10,18 +8,18 @@ class Board
   def update_board(cells = @@cells)
     i = 0
     # Create a 2d Array to display the board
-    multi_dimensional_cells = unflatten_array(cells)
+    nested_cells = unflatten_array(cells)
     
-    while i < multi_dimensional_cells .length
-      multi_dimensional_cells [i].each_with_index do |element, index|
+    while i < nested_cells.length
+      nested_cells[i].each_with_index do |element, index|
 
         # Element NOT last position?
-        if index != multi_dimensional_cells [i].length - 1
+        if index != nested_cells[i].length - 1
           print " #{element} |"
         # Last inner array?
-        elsif multi_dimensional_cells [i] == multi_dimensional_cells .last 
+        elsif nested_cells[i] == nested_cells.last 
           # Last element of inner array?
-          if index == multi_dimensional_cells [i].length - 1
+          if index == nested_cells[i].length - 1
             puts " #{element}" 
           end
         else
@@ -94,7 +92,7 @@ class Game
     end
   end
 
-  def update_cells_array_with_mark
+  def update_cells_data
     index = @cells.index(@mark)
     @cells[index] = @current_player
   end
@@ -104,7 +102,7 @@ class Game
   end
 
   def switch_player
-    @current_player =  @current_player == @player1 ? @player2 : @player1
+    @current_player = @current_player == @player1 ? @player2 : @player1
   end
 
   def play_game
@@ -114,21 +112,22 @@ class Game
     @current_player = @player1
     display_board
 
-    until end_game
+    until game_ended?
       get_player_mark
-      update_cells_array_with_mark
-      update_win_variant
+      update_cells_data
+      update_win_variant_data
       display_board
       switch_player
     end
   end
 
-  def end_game
-    check_win || check_draw
+  def game_ended?
+    player_won? || draw?
   end
 
-  def check_draw
+  def draw?
     draw = false
+    # All the data has been overwritten by player's mark?
     if @cells.all? { |cell| !cell.is_a? Integer }
       puts "It's a draw!"
       draw = true
@@ -136,15 +135,16 @@ class Game
     draw 
   end
 
-  def check_win
-    multi_dimensional_winning_variant = @winning_variant.each_slice(3).to_a
+  def player_won?
+    # Create a 2d array for checking winner
+    nested_winning_variant = @winning_variant.each_slice(3).to_a
     player_won = false
 
-    multi_dimensional_winning_variant.each_index do |index|
-      if multi_dimensional_winning_variant[index].all? { |mark| mark == @player1 }
+    nested_winning_variant.each_index do |index|
+      if nested_winning_variant[index].all? { |mark| mark == @player1 }
         puts "Player 1 Wins!"
         player_won = true
-      elsif multi_dimensional_winning_variant[index].all? { |mark| mark == @player2 }
+      elsif nested_winning_variant[index].all? { |mark| mark == @player2 }
         puts "Player 2 Wins!"
         player_won = true
       end
@@ -153,13 +153,16 @@ class Game
     player_won
   end
 
-  def update_win_variant
+  def update_win_variant_data
+    # Overwritten all elements with player's move to
+    # player's mark
     @winning_variant.each_with_index do |el, index|
       if el == @mark
         @winning_variant[index] = @current_player
       end
     end
   end
+
 end
 
 new_game = Game.new
