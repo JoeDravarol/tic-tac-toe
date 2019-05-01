@@ -1,18 +1,4 @@
-# Think about how you would set up the different elements within the game… What should 
-# be a class? Instance variable? Method? A few minutes of thought can save you from 
-# wasting an hour of coding.
-
-# Build your game, taking care to not share information between classes any more than you 
-# have to.
-
-# [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], [7,5,3]]
-
-# 5. Loop through the a solution collections to check if anyone has got a line
-# 6. If both players didn't get a line then it's a draw
 # 7. Ask if the player would like to play again 
-
-# Possible methods - check win condition, update board, deal with player move data
-# Possible methods - Update board data, 
 
 class Board
   @@cells = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -54,10 +40,11 @@ class Board
 end
 
 class Game
-  attr_accessor :player1, :player2, :current_player, :board, :cells, :mark
+  attr_accessor :player1, :player2, :current_player, :board, :cells, :mark, :winning_variant
   
   def initialize
     @cells = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    @winning_variant = [1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 4, 7, 2, 5, 8, 3, 6, 9, 1, 5, 9, 7, 5, 3]
     display_instructions
     @board = Board.new
     play_game
@@ -130,13 +117,48 @@ class Game
     until end_game
       get_player_mark
       update_cells_array_with_mark
+      update_win_variant
       display_board
       switch_player
     end
   end
 
   def end_game
-    false
+    check_win || check_draw
+  end
+
+  def check_draw
+    draw = false
+    if @cells.all? { |cell| !cell.is_a? Integer }
+      puts "It's a draw!"
+      draw = true
+    end
+    draw 
+  end
+
+  def check_win
+    multi_dimensional_winning_variant = @winning_variant.each_slice(3).to_a
+    player_won = false
+
+    multi_dimensional_winning_variant.each_index do |index|
+      if multi_dimensional_winning_variant[index].all? { |mark| mark == @player1 }
+        puts "Player 1 Wins!"
+        player_won = true
+      elsif multi_dimensional_winning_variant[index].all? { |mark| mark == @player2 }
+        puts "Player 2 Wins!"
+        player_won = true
+      end
+    end
+
+    player_won
+  end
+
+  def update_win_variant
+    @winning_variant.each_with_index do |el, index|
+      if el == @mark
+        @winning_variant[index] = @current_player
+      end
+    end
   end
 end
 
